@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>ImBundle by snowcap</title>
+    
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>ImBundle</h1>
+        <p>Imagemagick wrapper for Symfony2</p>
+        <p class="view"><a href="https://github.com/snowcap/SnowcapImBundle">View the Project on GitHub <small>snowcap/SnowcapImBundle</small></a></p>
+        <ul>
+          <li><a href="https://github.com/snowcap/SnowcapImBundle/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/snowcap/SnowcapImBundle/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/snowcap/SnowcapImBundle">Fork On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Snowcap IM Bundle</h1>
+
+<h1>Introduction</h1>
+
+<p>Imagemagick wrapper for Symfony2.<br>
+It's a general wrapper to access imagemagick command line functions, instead of using bindings like iMagick, which doesn't cover all the imagemagick functionalities.</p>
+
+<p>It allows you to use all the convert/mogrify power, from your controller or your views</p>
+
+<h2>Usage</h2>
+
+<h3>Twig Tag</h3>
+
+<pre>
+{% imresize %}
+  &lt;p&gt;some content&lt;/p&gt;
+  &lt;img src="/some/path" width="100" /&gt;
+  &lt;img src="{{ asset('/some/path') }}" width="100" /&gt;
+{% endimresize %}  
+</pre>
+
+<p>This will parse all content inside the tag and render image caches regarding their HTML width and/or height attributes</p>
+
+<h3>Twig function</h3>
+
+<pre>
+  &lt;img src="{{ imresize('/some/path','small') }}"/&gt;
+  &lt;img src="{{ imresize('/some/path','120x') }}"/&gt;
+  &lt;img src="{{ imresize('/some/path','x120') }}"/&gt;
+  &lt;img src="{{ imresize('/some/path','120x120') }}"/&gt;
+</pre>
+
+<p>The format - the second argument - can be a predefined format in your configuration, or a [width]x[height] syntax</p>
+
+<h3>Twig filter</h3>
+
+<pre>
+  &lt;img src="{{ '/some/path' | imresize('small') }}"/&gt;
+  &lt;img src="{{ asset('/some/path') | imresize('small') }}"/&gt;
+</pre>
+
+<h3>From a controller</h3>
+
+<pre>
+$im = $this-&gt;get("snowcap_im.manager");
+
+// to create a cached file
+$im-&gt;convert($format, $path);
+
+// to resize the source file
+$im-&gt;mogrify($format, $path);
+</pre>
+
+<h3>In entities</h3>
+
+<p>If you need to alter an uploaded image, you can add annotations on the file public property from your entity</p>
+
+<pre>
+// ...
+use Snowcap\ImBundle\Doctrine\Mapping as SnowcapIm;
+// ...
+
+    /**
+     *
+     * @Assert\File(maxSize="6000000")
+     * @SnowcapIm\Mogrify(params={"thumbnail"="100x100&gt;"})
+     */
+    public $file;
+</pre>
+
+<p>When the form is submitted, the file will then be "thumbnailed" to 100x100 if bigger. You can then use the $file-&gt;move() method like usual.</p>
+
+<p>The <code>params</code> attribute can contain</p>
+
+<ul>
+<li>an array of ImageMagick key/values (like the example above)</li>
+<li>a format predefined in config</li>
+</ul><h2>Installation</h2>
+
+<h3>Requirements</h3>
+
+<ul>
+<li>You need to have the ImageMagick binaries available (convert &amp; mogrify)</li>
+<li>You need to have a cache folder in your web dir, writeable by the webserver</li>
+</ul><h3>Clone the repo</h3>
+
+<p>put the following in your <code>deps</code> file</p>
+
+<pre>
+[SnowcapImBundle]
+    git=<a href="https://github.com/snowcap/SnowcapImBundle.git">https://github.com/snowcap/SnowcapImBundle.git</a>
+    target=/bundles/Snowcap/ImBundle
+</pre>
+
+<h3>Activate the bundle</h3>
+
+<p><code>app/autoload.php</code></p>
+
+<pre>
+    'Snowcap'          =&gt; __DIR__.'/../vendor/bundles',
+</pre>
+
+<p><code>app/AppKernel.php</code></p>
+
+<pre>
+new Snowcap\ImBundle\SnowcapImBundle(),
+</pre>
+
+<p><code>app/config/routing.yml</code></p>
+
+<pre>
+snowcap_im:
+  resource: "@SnowcapImBundle/Resources/config/routing.yml"
+</pre>
+
+<h2>Configuration</h2>
+
+<p><code>app/config.yml</code></p>
+
+<pre>
+snowcap_im:
+    # optional, the directory where your imagemagick binaries are. Default: /usr/bin/
+    binary_path: '/opt/local/bin/'
+
+    # optional too, a list of pre-defined conversions
+    formats:
+        # resizes to 50 width, at 80% quality
+        small:
+            resize: 50x
+            quality: 80
+
+        # resizes to fit in 100x100, only if bigger, and remove all crap (meta-data, ...)    
+        medium:
+            thumbnail: 100x100&gt;
+            
+        # crop to get exactly 100x100, keeping the maximum area possible, centered
+        square:
+            resize: 100x100^
+            gravity: center
+            crop: 100x100+0+0
+</pre>
+
+<h2>Clearing the cache</h2>
+
+<p>You can clear the cache with the following command-line task</p>
+
+<pre>
+./app/console snowcap:im:clear [age]
+</pre>
+
+<p>Where the age argument - optionnal - will only clear cache older than the argument</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/snowcap">snowcap</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
