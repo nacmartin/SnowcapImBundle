@@ -183,6 +183,29 @@ snowcap_im:
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
-    
+
+<h2>Additionnal information</h2>
+
+<p>To know more about the possible options for the formats, you'll find the exhaustive list on the ImageMagick website at http://www.imagemagick.org/script/command-line-processing.php</p>
+
+<p>Below you'll find a list of the possible syntaxes available in the <code>resize</code> and <code>thumbnail</code> format options</p>
+
+<table border="0">
+<tr>
+<td>Size</td>
+<td>Description</td>
+</tr>
+<tr><td>scale%</td><td>Height and width both scaled by specified percentage.</td></tr>
+<tr><td>scale-x%xscale-y%</td><td>Height and width individually scaled by specified percentages. (Only one % symbol needed.)</td></tr>
+<tr><td>width</td><td>Width given, height automagically selected to preserve aspect ratio.</td></tr>
+<tr><td>xheight</td><td>Height given, width automagically selected to preserve aspect ratio.</td></tr>
+<tr><td>widthxheight</td><td>Maximum values of height and width given, aspect ratio preserved.</td></tr>
+<tr><td>widthxheight^</td><td>Minimum values of width and height given, aspect ratio preserved.</td></tr>
+<tr><td>widthxheight!</td><td>Width and height emphatically given, original aspect ratio ignored.</td></tr>
+<tr><td>widthxheight></td><td>Shrinks images with dimension(s) larger than the corresponding width and/or height dimension(s).</td></tr>
+<tr><td>widthxheight<</td><td>Enlarges images with dimension(s) smaller than the corresponding width and/or height dimension(s).</td></tr>
+<tr><td>area@</td><td>Resize image to have specified area in pixels. Aspect ratio is preserved.</td></tr>
+</table>
+
   </body>
 </html>
